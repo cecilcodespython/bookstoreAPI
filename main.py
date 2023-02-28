@@ -3,6 +3,7 @@ import models
 from database import engine,Session_local
 from schema import Book
 from sqlalchemy.orm import Session
+from random import randint
 
 
 
@@ -30,6 +31,15 @@ def createBook(request:Book,db:Session=Depends(get_db)):
     db.refresh(new_book)
     return new_book
 
+@app.get("/book/random")
+def getRandomBook(db:Session=Depends(get_db)):
+    num_of_books = db.query(models.BookDetails).count()
+    random_id = randint(1,num_of_books)
+    random_book = db.query(models.BookDetails).filter(models.BookDetails.id == random_id).first()
+    return random_book
+
+   
+
 
 @app.get("/books")
 def getAllBooks(db: Session = Depends(get_db)):
@@ -45,5 +55,21 @@ def getBookByID(db:Session=Depends(get_db),id:int = id):
 
 @app.get("/book/author/{author_name}")
 def getBookByAuthor(author_name:str,db:Session=Depends(get_db)):
-    book = db.query(models.BookDetails).filter(models.BookDetails.author_name==author_name).first()
+    book = db.query(models.BookDetails).filter(models.BookDetails.author_name==author_name).all()
     return book
+
+@app.get("/book/isbn/{isbn}")
+def getBookByIsbn(isbn:int,db:Session=Depends(get_db)):
+    book = db.query(models.BookDetails).filter(models.BookDetails.isbn ==isbn).first()
+    return book
+
+
+@app.get("/book/random")
+def getRandomBook(db:Session=Depends(get_db)):
+    num_of_books = db.query(models.BookDetails).count()
+    random_id = randint(1,num_of_books)
+    random_book = db.query(models.BookDetails).filter(models.BookDetails.id == random_id).first()
+    return random_book
+
+   
+
