@@ -25,7 +25,7 @@ def get_db():
 
 @app.post("/book")
 def createBook(request:Book,db:Session=Depends(get_db)):
-    new_book = models.BookDetails(author_name=request.author_name,isbn=request.isbn,description=request.description)
+    new_book = models.BookDetails(author_name=request.author_name,isbn=request.isbn,description=request.description,genre=request.genre,title=request.title)
     db.add(new_book)
     db.commit()
     db.refresh(new_book)
@@ -44,6 +44,12 @@ def getRandomBook(db:Session=Depends(get_db)):
 @app.get("/books")
 def getAllBooks(db: Session = Depends(get_db)):
     books = db.query(models.BookDetails).all()
+    return books
+
+
+@app.get("/book/{genre}")
+def getAllBooksbyGenre(genre:str,db:Session=Depends(get_db)):
+    books = db.query(models.BookDetails).filter(models.BookDetails.genre==genre).all()
     return books
 
 
@@ -71,5 +77,15 @@ def getRandomBook(db:Session=Depends(get_db)):
     random_book = db.query(models.BookDetails).filter(models.BookDetails.id == random_id).first()
     return random_book
 
-   
+
+@app.delete("/book/delete/{book_id}")
+def deleteBook(book_id:int,db:Session=Depends(get_db)):
+    book = db.query(models.BookDetails).filter(models.BookDetails.id==book_id).first()
+    if book:
+        db.delete(book)
+        db.commit()
+        return {"message":"book has beem deleted"}
+    else:
+        return {"message":"book does not exist"}
+    
 

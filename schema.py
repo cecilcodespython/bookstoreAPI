@@ -6,4 +6,5 @@ class Book(BaseModel):
     author_name:str
     isbn: str
     description:str
+    genre:str
     
